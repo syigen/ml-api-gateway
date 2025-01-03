@@ -1,18 +1,11 @@
 from fastapi import FastAPI
+from api.v1.endpoints.base import router as base_router
 
 app = FastAPI()
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello Worl 22d"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
+app.include_router(base_router, prefix="/api/v1", tags=["base"])
 
 if __name__ == '__main__':
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="debug", reload=True)
