@@ -10,12 +10,15 @@ router = APIRouter()
 @router.post("/login", response_model=LoginResponse)
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     try:
-        authenticated_user = verify_user(user.email, user.password, db)
+        authenticated_user = verify_user(user, db)
         if not authenticated_user:
-            return LoginResponse(
-                email=authenticated_user.email,
-                message="Login successful.",
+            raise HTTPException(
+                status_code=401, detail="Invalid email or password"
             )
+        return LoginResponse(
+            email=authenticated_user.email,
+            message="Login successful.",
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
