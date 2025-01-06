@@ -16,3 +16,10 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+
+class LoginResponse(BaseModel):
+    email: EmailStr
+    message: str
