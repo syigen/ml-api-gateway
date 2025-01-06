@@ -17,10 +17,10 @@ class UserResponse(BaseModel):
     id: int
     email: str
 
-class UserLogin(BaseModel):
+class AuthRequest(BaseModel):
     email: EmailStr
     password: str
 
-class LoginResponse(BaseModel):
+class AuthResponse(BaseModel):
+    id: int
     email: EmailStr
-    message: str
