@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from app.api.v1.endpoints.base import router as base_router
+from app.api.v1.endpoints.user_login import router as login_router
+from app.db.database import Base, engine
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
 
 app.include_router(base_router, prefix="/api/v1", tags=["base"])
+app.include_router(login_router, prefix="/api/v1/user", tags=["user_login"])
 
 if __name__ == '__main__':
     import uvicorn
