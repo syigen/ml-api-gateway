@@ -22,4 +22,3 @@ class UserAPIKeys(Base):
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now(), nullable=False)
 
-    user = relationship("User", back_populates="api_keys")
