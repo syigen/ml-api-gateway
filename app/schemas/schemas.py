@@ -7,3 +7,4 @@ class AuthRequest(BaseModel):
 class AuthResponse(BaseModel):
     id: int
     email: EmailStr
+    api_key: str

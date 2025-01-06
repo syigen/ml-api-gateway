@@ -1,10 +1,6 @@
 from datetime import datetime
 
-features/api-token-mgmt
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
-
-from sqlalchemy import Column, Integer, String, DateTime
 from .database import Base
 
 class User(Base):
