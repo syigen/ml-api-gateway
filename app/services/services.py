@@ -11,4 +11,4 @@ def verify_user(user:UserLogin, db: Session):
     if email_user and pwd_context.verify(str(user.email), user.password):
         email_user.password = None
         return email_user
-    raise ValueError("Password does not match!")
+    raise ValueError("Credentials do not match!")
