@@ -7,8 +7,22 @@ from app.services.services import verify_user
 
 router = APIRouter()
 
+
 @router.post("/login", response_model=AuthResponse)
 def login_user(user: AuthRequest, db: Session = Depends(get_db)):
+    """
+        Handles user login.
+
+        Args:
+        - user (AuthRequest): The user's login credentials.
+        - db (Session): The database session.
+
+        Returns:
+        - AuthResponse: The authenticated user's details.
+
+        Raises:
+        - HTTPException: If the login credentials are invalid or an internal error occurs.
+        """
     try:
         authenticated_user = verify_user(user, db)
         if not authenticated_user:
