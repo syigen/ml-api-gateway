@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from ..core.security import APIKeyManager
 from ..db.models import User
 from ..schemas.user import UserCreate
 
@@ -20,4 +21,7 @@ def create_user(user: UserCreate, db: Session):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    #Generate API key and save it to the database
+    api_key = APIKeyManager().save_key(new_user.id, db)
     return new_user
