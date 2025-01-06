@@ -20,7 +20,7 @@ def login_user(user: AuthRequest, db: Session = Depends(get_db)):
         return AuthResponse(
             email=authenticated_user.email,
             id=authenticated_user.id,
-            api_key=api_key
+            api_key=str(api_key)
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

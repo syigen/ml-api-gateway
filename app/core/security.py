@@ -70,7 +70,7 @@ class APIKeyManager:
             raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found")
 
         # Generate a new API key
-        api_key = self.generate_key(user.email)
+        api_key = self.generate_key(str(user.email))
 
         # Save the key to the database
         new_key = UserAPIKeys(
