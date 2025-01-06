@@ -17,7 +17,7 @@ def login_user(user: AuthRequest, db: Session = Depends(get_db)):
             )
         return AuthResponse(
             email=authenticated_user.email,
-            message="Login successful.",
+            id=authenticated_user.id,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
