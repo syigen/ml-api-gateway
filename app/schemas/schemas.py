@@ -1,9 +1,8 @@
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr
 
-class UserCreate(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
-    password: constr(min_length=8, pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$")
 
-class UserResponse(BaseModel):
-    id: int
-    email: str
+class LoginResponse(BaseModel):
+    email: EmailStr
+    message: str
