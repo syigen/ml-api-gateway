@@ -36,3 +36,4 @@ async def log_response_usage():
             print(f"Failed to call /response: {e}")
             return {"message": "Failed to call /response", "error": str(e)}
 
+#print()
