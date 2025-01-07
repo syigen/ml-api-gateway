@@ -1,6 +1,4 @@
 import pytest
-from fastapi import HTTPException
-from pydantic import ValidationError
 from unittest.mock import patch
 
 from app.schemas.user import UserCreate
