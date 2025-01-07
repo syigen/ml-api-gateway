@@ -41,6 +41,7 @@ def create_user(user: UserCreate, db: Session):
     hashed_password = get_password_hash(user.password)
     new_user = User(email=str(user.email), hashed_password=hashed_password)
     db.add(new_user)
+    db.commit()
     db.refresh(new_user)
 
     #Generate API key and save it to the database

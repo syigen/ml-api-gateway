@@ -10,15 +10,15 @@ def test_user_create_valid():
     assert user.email == "test@example.com"
     assert user.password == "Password123"
 
-@pytest.mark.parametrize("email, password", [
-    ("test@example.com", "password"),
-    ("test@example.com", "Password"),
-    ("test@example.com", "password1"),
-    ("test@example.com", "PASSWORD"),
-    ("test@example.com", "PASSWORD1"),
+@pytest.mark.parametrize("email, password, value_error " , [
+    ("test@example.com", "password", "Password must contain at least one digit"),
+    ("test@example.com", "Password", "Password must contain at least one digit"),
+    ("test@example.com", "password1", "Password must contain at least one uppercase letter"),
+    ("test@example.com", "PASSWORD", "Password must contain at least one digit"),
+    ("test@example.com", "PASSWORD1", "Password must contain at least one lowercase letter"),
 ])
-def test_user_create_invalid_password(email, password):
-    with pytest.raises(ValueError):
+def test_user_create_invalid_password(email, password,value_error):
+    with pytest.raises(ValueError, match=value_error):
         UserCreate(email=email, password=password)
 
 @pytest.mark.parametrize("email, password", [
@@ -28,7 +28,7 @@ def test_user_create_invalid_password(email, password):
     ("testmail@gamil", "Password123"),
     ("testmail@gamil.", "Password123"),
 ])
-def test_user_create_invalid_email(email,password):
+def test_user_create_invalid_email(email, password):
     with pytest.raises(ValueError):
         UserCreate(email=email, password=password)
 
