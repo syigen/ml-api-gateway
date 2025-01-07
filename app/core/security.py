@@ -44,7 +44,7 @@ class APIKeyManager:
         Returns:
             str: The generated API key
         """
-        key_base = f"{email}{self.private_salt}{datetime.utcnow().timestamp()}"
+        key_base = f"{email}{self.private_salt}{datetime.now().timestamp()}"
         generated_key = hashlib.sha256(key_base.encode('utf-8')).hexdigest()
         return f"{self.key_prefix}{generated_key}"
 
@@ -79,7 +79,7 @@ class APIKeyManager:
         new_key = UserAPIKeys(
             user_id=user_id,
             api_key=api_key,
-            created_at=datetime.utcnow()
+            created_at=datetime.now()
         )
         db.add(new_key)
         db.commit()
@@ -144,13 +144,10 @@ class APIKeyManager:
             store_key = UserAPIKeys(
                 user_id=int(str(current_user.id)),
                 api_key=new_api_key,
-                created_at=datetime.utcnow()
+                created_at=datetime.now()
             )
             db.add(store_key)
             db.commit()
-
-            if not isinstance(current_user.id, int):
-                raise ValueError("User ID must be an integer")
 
             # Schedule the deletion of old keys
             background_tasks.add_task(
