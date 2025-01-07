@@ -144,13 +144,10 @@ class APIKeyManager:
             store_key = UserAPIKeys(
                 user_id=int(str(current_user.id)),
                 api_key=new_api_key,
-                created_at=datetime.utcnow()
+                created_at=datetime.now()
             )
             db.add(store_key)
             db.commit()
-
-            if not isinstance(current_user.id, int):
-                raise ValueError("User ID must be an integer")
 
             # Schedule the deletion of old keys
             background_tasks.add_task(
