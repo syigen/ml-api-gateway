@@ -1,11 +1,14 @@
+import asyncio
 from datetime import datetime
 import hashlib
 import os
-from typing import Type
+from typing import Type, Union
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, InstrumentedAttribute
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from app.db.models import UserAPIKeys, User
+from app.schemas.schemas import AuthRequest
 
 
 class APIKeyManager:
@@ -82,6 +85,85 @@ class APIKeyManager:
         db.commit()
 
         return api_key
+
+    @staticmethod
+    async def delete_old_key(db: Session, user_id: int, delay_minutes: int = 5):
+        """
+        Asynchronously delete the old API key after a specified delay.
+
+        Args:
+            db (Session): Database session
+            user_id (int): User ID
+            delay_minutes (int): Delay in minutes before deletion
+        """
+        await asyncio.sleep(delay_minutes * 60)
+
+        try:
+            # Get all API keys for the user except the newest one
+            old_keys = (
+                db.query(UserAPIKeys)
+                .filter(UserAPIKeys.user_id == user_id)
+                .order_by(UserAPIKeys.created_at.desc())
+                .offset(1)
+                .all()
+            )
+
+            # Delete old keys
+            for key in old_keys:
+                db.delete(key)
+            db.commit()
+        except SQLAlchemyError as e:
+            db.rollback()
+            print(f"Error deleting old API keys: {str(e)}")
+
+    def reset_key(self, user: AuthRequest, db: Session, background_tasks: BackgroundTasks) -> Union[str, None]:
+        """
+        Reset the API key for a user.
+
+        Args:
+            user (AuthRequest): The user object containing the email of the user.
+            db (Session): The database session.
+            background_tasks: FastAPI BackgroundTasks for async execution.
+
+        Returns:
+            str: The new generated API key.
+
+        Raises:
+            HTTPException: If the user is not found or there's an error updating the API key.
+        """
+        # Fetch the user from the database
+        current_user = db.query(User).filter(User.email == user.email).first()
+        if not current_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Generate a new API key
+        try:
+            new_api_key = self.generate_key(str(current_user.email))
+
+            # Update the API key and timestamp
+            store_key = UserAPIKeys(
+                user_id=int(str(current_user.id)),
+                api_key=new_api_key,
+                created_at=datetime.utcnow()
+            )
+            db.add(store_key)
+            db.commit()
+
+            if not isinstance(current_user.id, int):
+                raise ValueError("User ID must be an integer")
+
+            # Schedule the deletion of old keys
+            background_tasks.add_task(
+                self.delete_old_key,
+                db=db,
+                user_id=int(str(current_user.id))
+            )
+
+            return new_api_key
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise HTTPException(status_code=500, detail=f"Error updating API key: {str(e)}")
+
 
 def verify_api_key(api_key: str, db: Session) -> Type[User]:
     """
