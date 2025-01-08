@@ -1,20 +1,19 @@
 from fastapi import APIRouter
-from app.core.monitoring import  timeit
+from app.core.monitoring import timeit
 import asyncio
 from fastapi.testclient import TestClient
 import threading
 
-
 router = APIRouter()
 
 response_time_data = {}
+
 
 @router.get("/response", tags=["Response"])
 @timeit
 async def get_responses():
     await asyncio.sleep(1)
     return {"message": "This is the /response endpoint."}
-
 
 
 @router.get("/response-usage", tags=["ResponseUsage"])
@@ -32,6 +31,3 @@ def trigger_response_usage():
     thread.start()
 
     return {"message": "Response usage calculation triggered."}
-
-
-#print()
