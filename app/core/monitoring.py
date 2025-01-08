@@ -27,8 +27,3 @@ def timeit(func):
         return async_timeit_wrapper
     else:
         return sync_timeit_wrapper
-
-
-
-
-
