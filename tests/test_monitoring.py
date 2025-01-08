@@ -27,6 +27,7 @@ def test_can_get_response_usage():
     response_data = response.json()
     assert response_data["message"] == "This is the /response endpoint."
 
+
 def test_can_get_response():
     response = requests.get(ENDPOINT + "/api/v1/monitor/response")
     print(f"Response Status Code: {response.status_code}")
@@ -35,13 +36,9 @@ def test_can_get_response():
     response_data = response.json()
     assert response_data["message"] == "This is the /response endpoint."
 
+
 def test_error_handling():
     response = client.get("/nonexistent")
     print(f"Error Handling Status Code: {response.status_code}")
     print(f"Error Handling Body: {response.text}")
     assert response.status_code == 404
-
-# if __name__ == "__main__":
-#     test_can_get_response_usage()
-#     test_can_get_response()
-#     test_error_handling()
