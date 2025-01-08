@@ -23,6 +23,7 @@ def test_user_create_valid():
 
 
 @pytest.mark.parametrize("email, password, value_error", [
+    ("test@example.com", "Pa1", "String should have at least 8 characters"),
     ("test@example.com", "password", "Password must contain at least one digit"),
     ("test@example.com", "Password", "Password must contain at least one digit"),
     ("test@example.com", "password1", "Password must contain at least one uppercase letter"),
