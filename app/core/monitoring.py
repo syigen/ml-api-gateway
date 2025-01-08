@@ -1,38 +1,29 @@
+from fastapi import APIRouter, FastAPI
+from functools import wraps
 import time
-from fastapi import APIRouter
-from fastapi.testclient import TestClient
-import threading
-from fastapi import FastAPI
-
-app = FastAPI()
-router = APIRouter()
-
-response_time_data = {}
-
-app.include_router(router)
+import asyncio
 
 
-@router.get("/response", tags=["Response"])
-async def get_responses():
-    return {"message": "This is the /response endpoint."}
+def timeit(func):
+    @wraps(func)
+    async def async_timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = await func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        print(f"Async Function {func.__name__} Took {total_time:.4f} seconds")
+        return result
 
+    @wraps(func)
+    def sync_timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        print(f"Sync Function {func.__name__} Took {total_time:.4f} seconds")
+        return result
 
-@router.get("/response-usage", tags=["ResponseUsage"])
-def trigger_response_usage():
-    def measure_response_time():
-        with TestClient(app) as client:
-            start_time = time.time()
-
-            response = client.get("/response")
-
-            end_time = time.time()
-            response_time = end_time - start_time
-
-            response_time_data["/response"] = response_time
-            print(f"Response time for /response: {response_time:.4f} seconds")
-
-
-    thread = threading.Thread(target=measure_response_time)
-    thread.start()
-
-    return {"message": "Response usage calculation triggered."}
+    if asyncio.iscoroutinefunction(func):
+        return async_timeit_wrapper
+    else:
+        return sync_timeit_wrapper
