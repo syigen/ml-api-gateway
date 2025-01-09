@@ -31,6 +31,18 @@ class User(Base):
 
 
 class UserAPIKeys(Base):
+    """
+        Represents the API keys associated with users.
+
+        Attributes:
+            __tablename__ (str): The name of the database table ("user_api_keys").
+            id (int): The primary key for the API key record.
+            user_id (int): The ID of the user this API key belongs to. Foreign key referencing the "users" table.
+            api_key (str): The API key string.
+            created_at (datetime): The timestamp when the API key was created. Defaults to the current time.
+            updated_at (datetime): The timestamp when the API key was last updated. Automatically updates on modification.
+            user (relationship): The relationship to the User model, enabling back-population of API keys.
+        """
     __tablename__ = "user_api_keys"
 
     id = Column(Integer, primary_key=True, index=True)
