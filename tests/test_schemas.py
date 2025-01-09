@@ -1,6 +1,9 @@
 import unittest
 from unittest.mock import MagicMock
+
 from pydantic import ValidationError
+from pydantic.v1 import EmailStr
+
 from app.schemas.auth_schemas import AuthRequest, AuthResponse
 
 
@@ -53,7 +56,7 @@ class TestAuthModels(unittest.TestCase):
         def mock_authenticate(email, password):
             for user in self.temp_db["users"]:
                 if user["email"] == email and user["password"] == password:
-                    return AuthResponse(id=user["id"], email=user["email"], api_key=user["api_key"])
+                    return AuthResponse(id=user["id"], email=EmailStr(user["email"]), api_key=user["api_key"])
             return None
 
         auth_service.authenticate = mock_authenticate

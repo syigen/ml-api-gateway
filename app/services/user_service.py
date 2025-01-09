@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..core.security import APIKeyManager
 from ..db.models import User
-from ..schemas.user_schemas import User
+from ..schemas.user_schemas import UserCreate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -21,7 +21,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_user(user_data: User, db: Session):
+def create_user(user_data: UserCreate, db: Session):
     """
         Creates a new user in the database.
 

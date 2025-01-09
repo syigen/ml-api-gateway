@@ -1,7 +1,8 @@
-import pytest
-from datetime import datetime
 import os
+from datetime import datetime
 from unittest.mock import patch
+
+import pytest
 from fastapi import HTTPException
 from pydantic.v1 import EmailStr
 
@@ -11,6 +12,7 @@ from .test_database import db_session, api_key_manager, test_key_user, backgroun
 
 # Constant Values
 const_key_prefix = 'sk_live_'
+
 
 def test_api_key_manager_initialization(api_key_manager):
     """

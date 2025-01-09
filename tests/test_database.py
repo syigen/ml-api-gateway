@@ -1,11 +1,12 @@
+import os
+from datetime import datetime
+from unittest.mock import patch
+
+import pytest
 from fastapi import BackgroundTasks
 from passlib.context import CryptContext
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
-from datetime import datetime
-import pytest
-from unittest.mock import patch
-import os
 
 from app.core.security import APIKeyManager
 
@@ -17,6 +18,7 @@ Base = declarative_base()
 
 # Password Cryptography Context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 # User Model: Represents the "users" table in the database
 class User(Base):
@@ -34,6 +36,7 @@ class User(Base):
         cascade='all, delete-orphan'
     )
 
+
 # UserAPIKeys Model: Represents the "user_api_keys" table in the database
 class UserAPIKeys(Base):
     __tablename__ = "user_api_keys"
@@ -46,6 +49,7 @@ class UserAPIKeys(Base):
 
     # Relationship to the User model, providing access to the user associated with the API key
     user = relationship('User', back_populates='api_keys')
+
 
 @pytest.fixture(scope="session")
 def db_session():
@@ -89,6 +93,7 @@ def db_session():
     session.close()
     Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture
 def api_key_manager():
     """
@@ -103,6 +108,7 @@ def api_key_manager():
     with patch.dict(os.environ, {'API_SALT': 'test_salt'}):
         return APIKeyManager()
 
+
 @pytest.fixture
 def background_tasks():
     """
@@ -115,6 +121,7 @@ def background_tasks():
         BackgroundTasks: An instance of the `BackgroundTasks` class.
     """
     return BackgroundTasks()
+
 
 @pytest.fixture
 def test_key_user(db_session):
