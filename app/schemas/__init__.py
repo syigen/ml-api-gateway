@@ -1,1 +1,1 @@
-__all__ = ['user.py']
+__all__ = ['user']
