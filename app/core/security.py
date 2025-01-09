@@ -1,15 +1,16 @@
 import asyncio
-from datetime import datetime
 import hashlib
 import os
+from datetime import datetime
 from typing import Type, Union
 
+from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, InstrumentedAttribute
-from fastapi import HTTPException, BackgroundTasks
+
 from app.db.models import UserAPIKeys, User
-from app.schemas.schemas import AuthRequest
-from app.services.services import verify_user
+from app.schemas.auth_schemas import AuthRequest
+from app.services.auth_services import verify_user
 
 
 class APIKeyManager:
@@ -56,7 +57,7 @@ class APIKeyManager:
         Generate a secure API key based on email and salt.
 
         Args:
-            email (str): The email address to use in generating the key
+            email (EmailStr): The email address to use in generating the key
 
         Returns:
             str: The generated API key

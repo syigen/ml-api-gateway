@@ -15,58 +15,7 @@ Test Cases:
     - test_register_user_missing_fields: Tests required field validation
 """
 
-import pytest
 from fastapi.testclient import TestClient
-from main import app
-from app.db.database import get_db
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.db.models import Base
-
-# Setup test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-
-@pytest.fixture
-def client():
-    """Fixture that provides a test client with a test database session.
-
-    Overrides the database dependency with a test database session and yields
-    a TestClient instance for making test requests.
-
-    Yields:
-        TestClient: A configured test client for making HTTP requests
-    """
-
-    def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-
-
-@pytest.fixture
-def test_db():
-    """Fixture that provides a test database session and handles cleanup.
-
-    Creates a new database session for testing and cleans up user data
-    after each test to ensure a fresh state.
-
-    Yields:
-        Session: SQLAlchemy database session for testing
-    """
-    db = TestingSessionLocal()
-    yield db
-    db.query(Base.metadata.tables['users']).delete()  # Cleanup
-    db.commit()
 
 
 def test_register_user_success(client, test_db):
@@ -80,7 +29,7 @@ def test_register_user_success(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "testuser@example.com",
             "password": "Password123"
@@ -104,7 +53,7 @@ def test_register_user_duplicate(client, test_db):
     """
     # Create a user first
     client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "duplicateuser@example.com",
             "password": "Password123"
@@ -113,7 +62,7 @@ def test_register_user_duplicate(client, test_db):
 
     # Try creating the same user again
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "duplicateuser@example.com",
             "password": "Password1"
@@ -135,7 +84,7 @@ def test_register_user_invalid_email(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "invalidemail",
             "password": "Password1"
@@ -157,7 +106,7 @@ def test_register_user_missing_fields(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={}
     )
     assert response.status_code == 422

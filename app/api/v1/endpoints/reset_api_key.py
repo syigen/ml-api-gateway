@@ -5,16 +5,17 @@ from app.api.v1.deps import validate_api_key
 from app.core.security import APIKeyManager
 from app.db.database import get_db
 from app.db.models import User
-from app.schemas.schemas import AuthRequest
+from app.schemas.auth_schemas import AuthRequest
 
 router = APIRouter()
 
+
 @router.post("/reset-api-key")
 async def reset_api_key(
-    login_data: AuthRequest,
-    background_tasks: BackgroundTasks,
-    user: User = Depends(validate_api_key),
-    db: Session = Depends(get_db)
+        login_data: AuthRequest,
+        background_tasks: BackgroundTasks,
+        user: User = Depends(validate_api_key),
+        db: Session = Depends(get_db)
 ):
     """
     Resets the user's API key and schedules the deletion of the old key after expiration.

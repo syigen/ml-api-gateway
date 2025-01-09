@@ -1,16 +1,18 @@
 import pytest
 from unittest.mock import MagicMock
+
+from pydantic.v1 import EmailStr
 from sqlalchemy.orm import Session
-from app.schemas.schemas import AuthRequest
-from app.services.services import verify_user
+from app.schemas.auth_schemas import AuthRequest
+from app.services.auth_services import verify_user
 from app.db.models import User
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-valid_user_credentials = AuthRequest(email="user1@example.com", password="password1")
-invalid_user_credentials = AuthRequest(email="user1@example.com", password="wrongpassword")
-non_existent_user_credentials = AuthRequest(email="nonexistent@example.com", password="password")
+valid_user_credentials = AuthRequest(email=EmailStr("user1@example.com"), password="password1")
+invalid_user_credentials = AuthRequest(email=EmailStr("user1@example.com"), password="wrongpassword")
+non_existent_user_credentials = AuthRequest(email=EmailStr("nonexistent@example.com"), password="password")
 
 mock_users = [
     User(id=1, email="user1@example.com", hashed_password=pwd_context.hash("password1")),
@@ -18,11 +20,13 @@ mock_users = [
     User(id=3, email="user3@example.com", hashed_password=pwd_context.hash("password3")),
 ]
 
+
 def mock_query_filter(email):
     for user in mock_users:
         if user.email == email:
             return user
     return None
+
 
 # Test: Valid credentials
 def test_verify_user_valid_credentials():

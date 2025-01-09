@@ -1,8 +1,10 @@
-from fastapi import APIRouter
-from app.core.monitoring import timeit
 import asyncio
-from fastapi.testclient import TestClient
 import threading
+
+from fastapi import APIRouter
+from fastapi.testclient import TestClient
+
+from app.core.monitoring import timeit
 
 router = APIRouter()
 

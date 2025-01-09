@@ -1,38 +1,4 @@
-import pytest
-from fastapi.testclient import TestClient
-
-from app.db.database import get_db
-from main import app
-from .test_database import db_session, test_key_user, UserAPIKeys, TestingSessionLocal
-
-
-@pytest.fixture
-def client():
-    """
-    Fixture for creating a test client with an overridden database session.
-
-    This fixture:
-    - Overrides the `get_db` dependency to use a test database session.
-    - Yields a `TestClient` for sending requests to the FastAPI application.
-
-    Returns:
-        TestClient: A client for making HTTP requests to the FastAPI app with a test database.
-
-    Steps:
-    - Creates a new `TestingSessionLocal` instance to be used as the database session.
-    - Yields the `TestClient` to interact with the app during tests.
-    - Closes the database session after the test is completed.
-    """
-
-    def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
+from .conftest import db_session, test_key_user, UserAPIKeys
 
 
 def test_reset_api_key(db_session, test_key_user, client):
