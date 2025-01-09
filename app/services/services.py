@@ -32,6 +32,19 @@ def verify_user(user: AuthRequest, db: Session):
     raise ValueError("Credentials do not match!")
 
 def get_user_api_key(user_id: int, db: Session) -> Type[UserAPIKeys]:
+    """
+     Retrieve the API key for a specific user.
+
+     Args:
+         user_id (int): The ID of the user.
+         db (Session): The database session to execute queries.
+
+     Returns:
+         UserAPIKeys: The API key object associated with the user.
+
+     Raises:
+         HTTPException: If no API key is found for the user (401 Unauthorized).
+     """
     user_api_key = db.query(UserAPIKeys).filter(UserAPIKeys.user_id == user_id).first()
     if not user_api_key:
         raise HTTPException(status_code=401, detail="Invalid API Key")
