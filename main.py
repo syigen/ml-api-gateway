@@ -4,6 +4,8 @@ from app.api.v1.endpoints.user_login import router as login_router
 from app.api.v1.endpoints.user_register import router as register_router
 from app.api.v1.endpoints.reset_api_key import router as reset_api_key
 from app.db.database import Base, engine
+from app.api.v1.endpoints.monitor import router as monitoring_router
+
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
@@ -12,6 +14,7 @@ app.include_router(base_router, prefix="/api/v1", tags=["base"])
 app.include_router(base_router, prefix="/core", tags=["monitoring"])
 app.include_router(login_router, prefix="/api/v1/user", tags=["user_login"])
 app.include_router(register_router, prefix="/api/v1/user", tags=["user_register"])
+app.include_router(monitoring_router, prefix="/api/v1/monitor", tags=["monitor"])
 app.include_router(reset_api_key, prefix="/api/v1/user", tags=["reset_api_key"])
 
 if __name__ == '__main__':
