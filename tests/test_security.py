@@ -9,6 +9,8 @@ from app.core.security import verify_api_key, APIKeyManager
 from app.schemas.schemas import AuthRequest
 from .test_database import db_session, api_key_manager, test_key_user, background_tasks, UserAPIKeys
 
+# Constant Values
+const_key_prefix = 'sk_live_'
 
 def test_api_key_manager_initialization(api_key_manager):
     """
@@ -28,7 +30,7 @@ def test_api_key_manager_initialization(api_key_manager):
     with patch.dict(os.environ, {'API_SALT': 'test_salt'}):
         manager = APIKeyManager()
         assert manager.private_salt == 'test_salt'
-        assert manager.key_prefix == 'sk_live_'
+        assert manager.key_prefix == const_key_prefix
 
 
 def test_api_key_manager_initialization_no_salt(api_key_manager):
@@ -66,8 +68,8 @@ def test_generate_key(api_key_manager):
     - Assert the key starts with the correct prefix and has a valid length.
     """
     key = api_key_manager.generate_key("test@email.com")
-    assert key.startswith("sk_live_")
-    assert len(key) > len("sk_live_")
+    assert key.startswith(const_key_prefix)
+    assert len(key) > len(const_key_prefix)
 
 
 def test_save_key(api_key_manager, db_session, test_key_user):
@@ -212,7 +214,7 @@ def test_reset_key(api_key_manager, db_session, test_key_user, background_tasks)
 
     # Verify new key
     assert new_key is not None
-    assert new_key.startswith("sk_live_")
+    assert new_key.startswith(const_key_prefix)
 
     # Verify database record
     key_record = db_session.query(UserAPIKeys).filter_by(api_key=new_key).first()
