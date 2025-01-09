@@ -39,12 +39,12 @@ class APIKeyManager:
         Generate a secure API key based on email and salt.
 
         Args:
-            email (str): The email address to use in generating the key
+            email (EmailStr): The email address to use in generating the key
 
         Returns:
             str: The generated API key
         """
-        key_base = f"{email}{self.private_salt}{datetime.utcnow().timestamp()}"
+        key_base = f"{email}{self.private_salt}{datetime.now().timestamp()}"
         generated_key = hashlib.sha256(key_base.encode('utf-8')).hexdigest()
         return f"{self.key_prefix}{generated_key}"
 
@@ -79,7 +79,7 @@ class APIKeyManager:
         new_key = UserAPIKeys(
             user_id=user_id,
             api_key=api_key,
-            created_at=datetime.utcnow()
+            created_at=datetime.now()
         )
         db.add(new_key)
         db.commit()

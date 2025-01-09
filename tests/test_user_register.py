@@ -66,6 +66,7 @@ def test_db():
     db = TestingSessionLocal()
     yield db
     db.query(Base.metadata.tables['users']).delete()  # Cleanup
+    db.query(Base.metadata.tables['user_api_keys']).delete()  # Cleanup
     db.commit()
 
 

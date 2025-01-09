@@ -1,3 +1,4 @@
+from pydantic.v1 import EmailStr
 from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, HTTPException
 
@@ -22,7 +23,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         # Create the user
         created_user = create_user(user, db)
-        return RegisterResponse(email=created_user.email, message="User registered successfully.")
+        return RegisterResponse(email=EmailStr(created_user.email), message="User registered successfully.")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
