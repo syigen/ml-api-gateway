@@ -4,11 +4,16 @@ from unittest.mock import patch
 
 import pytest
 from fastapi import BackgroundTasks
+from fastapi.testclient import TestClient
 from passlib.context import CryptContext
+from pydantic.v1 import EmailStr
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
 from app.core.security import APIKeyManager
+from app.db.database import get_db
+from app.schemas.user_schemas import UserCreate
+from main import app
 
 # Database Configuration and Setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test-ml-safe-app.db"
@@ -138,3 +143,77 @@ def test_key_user(db_session):
         User: The user record with the email `user@email.com` from the test database.
     """
     return db_session.query(User).filter_by(email="user@email.com").first()
+
+
+@pytest.fixture
+def client():
+    """
+    Fixture for creating a test client with an overridden database session.
+
+    This fixture:
+    - Overrides the `get_db` dependency to use a test database session.
+    - Yields a `TestClient` for sending requests to the FastAPI application.
+
+    Returns:
+        TestClient: A client for making HTTP requests to the FastAPI app with a test database.
+
+    Steps:
+    - Creates a new `TestingSessionLocal` instance to be used as the database session.
+    - Yields the `TestClient` to interact with the app during tests.
+    - Closes the database session after the test is completed.
+    """
+
+    def override_get_db():
+        db = TestingSessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+
+
+@pytest.fixture
+def test_db():
+    """Fixture that provides a test database session and handles cleanup.
+
+    Creates a new database session for testing and cleans up user data
+    after each test to ensure a fresh state.
+
+    Yields:
+        Session: SQLAlchemy database session for testing
+    """
+    db = TestingSessionLocal()
+    yield db
+    db.query(Base.metadata.tables['users']).delete()  # Cleanup
+    db.query(Base.metadata.tables['user_api_keys']).delete()  # Cleanup
+    db.commit()
+
+
+@pytest.fixture
+def sample_user() -> UserCreate:
+    """
+    Creates a sample user for testing.
+
+    Returns:
+        User: A user creation schema with test data.
+    """
+    return UserCreate(
+        email=EmailStr("Dileepa@gmail.com"),
+        password="Sadeepa@2004"
+    )
+
+
+@pytest.fixture
+def duplicate_user() -> UserCreate:
+    """
+    Creates a duplicate user with the same email for testing uniqueness constraints.
+
+    Returns:
+        User: A user creation schema with the same email as sample_user.
+    """
+    return UserCreate(
+        email=EmailStr("Sadeepa@gmail.com"),
+        password="Sadeepa@2004"
+    )

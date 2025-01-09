@@ -105,7 +105,7 @@ class APIKeyManager:
         return api_key
 
     @staticmethod
-    async def delete_old_key(db: Session, user_id: int, delay_minutes: int = 1):
+    async def delete_old_key(db: Session, user_id: int, delay_minutes: int = 5):
         """
         Asynchronously delete the old API key after a specified delay.
 
@@ -178,7 +178,7 @@ class APIKeyManager:
                 self.delete_old_key,
                 db=db,
                 user_id=int(str(current_user.id)),
-                delay_minutes=1
+                delay_minutes=5
             )
 
             return new_api_key
