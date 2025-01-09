@@ -1,7 +1,6 @@
-from fastapi import APIRouter, FastAPI
-from functools import wraps
-import time
 import asyncio
+import time
+from functools import wraps
 
 
 def timeit(func):

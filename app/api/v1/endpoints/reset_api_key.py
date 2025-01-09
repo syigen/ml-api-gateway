@@ -5,7 +5,7 @@ from app.api.v1.deps import validate_api_key
 from app.core.security import APIKeyManager
 from app.db.database import get_db
 from app.db.models import User
-from app.schemas.schemas import AuthRequest
+from app.schemas.auth_schemas import AuthRequest
 
 router = APIRouter()
 

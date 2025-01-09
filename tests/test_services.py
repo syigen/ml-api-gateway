@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 from sqlalchemy.orm import Session
-from app.schemas.schemas import AuthRequest
-from app.services.services import verify_user
+from app.schemas.auth_schemas import AuthRequest
+from app.services.auth_services import verify_user
 from app.db.models import User
 from passlib.context import CryptContext
 
