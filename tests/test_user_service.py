@@ -13,65 +13,8 @@ Dependencies:
 """
 
 import pytest
-from pydantic.v1 import EmailStr
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from app.db.models import Base
-from app.schemas.user_schemas import UserCreate
 from app.services.user_service import create_user, get_password_hash
-
-# Test Database Setup
-db_url = "sqlite:///:memory:"
-engine = create_engine(db_url)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-@pytest.fixture(scope="session")
-def db_session():
-    """
-    Creates and manages a SQLAlchemy database session for testing.
-
-    Yields:
-        SQLAlchemy Session: A database session for test operations.
-
-    Notes:
-        - Uses an in-memory SQLite database
-        - Creates all tables before yielding the session
-        - Closes the session after tests complete
-    """
-    Base.metadata.create_all(bind=engine)
-    db = TestingSessionLocal()
-    yield db
-    db.close()
-
-
-@pytest.fixture
-def sample_user():
-    """
-    Creates a sample user for testing.
-
-    Returns:
-        User: A user creation schema with test data.
-    """
-    return UserCreate(
-        email=EmailStr("Dileepa@gmail.com"),
-        password="Sadeepa@2004"
-    )
-
-
-@pytest.fixture
-def duplicate_user():
-    """
-    Creates a duplicate user with the same email for testing uniqueness constraints.
-
-    Returns:
-        User: A user creation schema with the same email as sample_user.
-    """
-    return UserCreate(
-        email=EmailStr("Sadeepa@gmail.com"),
-        password="Sadeepa@2004"
-    )
 
 
 def test_get_password_hash():

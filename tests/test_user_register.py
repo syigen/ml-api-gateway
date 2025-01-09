@@ -15,60 +15,7 @@ Test Cases:
     - test_register_user_missing_fields: Tests required field validation
 """
 
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.db.database import get_db
-from app.db.models import Base
-from main import app
-
-# Setup test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-
-@pytest.fixture
-def client():
-    """Fixture that provides a test client with a test database session.
-
-    Overrides the database dependency with a test database session and yields
-    a TestClient instance for making test requests.
-
-    Yields:
-        TestClient: A configured test client for making HTTP requests
-    """
-
-    def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-
-
-@pytest.fixture
-def test_db():
-    """Fixture that provides a test database session and handles cleanup.
-
-    Creates a new database session for testing and cleans up user data
-    after each test to ensure a fresh state.
-
-    Yields:
-        Session: SQLAlchemy database session for testing
-    """
-    db = TestingSessionLocal()
-    yield db
-    db.query(Base.metadata.tables['users']).delete()  # Cleanup
-    db.query(Base.metadata.tables['user_api_keys']).delete()  # Cleanup
-    db.commit()
 
 
 def test_register_user_success(client, test_db):
