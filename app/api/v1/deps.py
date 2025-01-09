@@ -9,6 +9,7 @@ from app.db.models import User
 
 api_manager = APIKeyManager()
 
+
 def validate_api_key(x_api_key: str = Header(...), db: Session = Depends(get_db)) -> Type[User]:
     """
     Validate the API key provided in the request header.

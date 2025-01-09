@@ -1,10 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app
-from app.db.database import get_db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from app.db.database import get_db
 from app.db.models import Base
+from main import app
 
 # Setup test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -34,6 +35,7 @@ def test_db():
     db.query(Base.metadata.tables['users']).delete()  # Cleanup
     db.commit()
 
+
 def test_invalid_login_user(client, test_db):
     response = client.post(
         "api/v1/auth/login",
@@ -46,6 +48,7 @@ def test_invalid_login_user(client, test_db):
     data = response.json()
     assert "detail" in data
 
+
 def test_login_user_invalid_email(client, test_db):
     response = client.post(
         "api/v1/auth/login",
@@ -57,6 +60,7 @@ def test_login_user_invalid_email(client, test_db):
     assert response.status_code == 422
     data = response.json()
     assert "detail" in data
+
 
 def test_login_user_missing_fields(client, test_db):
     response = client.post(

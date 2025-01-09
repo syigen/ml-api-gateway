@@ -9,12 +9,13 @@ from app.schemas.auth_schemas import AuthRequest
 
 router = APIRouter()
 
+
 @router.post("/reset-api-key")
 async def reset_api_key(
-    login_data: AuthRequest,
-    background_tasks: BackgroundTasks,
-    user: User = Depends(validate_api_key),
-    db: Session = Depends(get_db)
+        login_data: AuthRequest,
+        background_tasks: BackgroundTasks,
+        user: User = Depends(validate_api_key),
+        db: Session = Depends(get_db)
 ):
     """
     Resets the user's API key and schedules the deletion of the old key after expiration.
