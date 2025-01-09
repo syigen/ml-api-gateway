@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session, InstrumentedAttribute
 from fastapi import HTTPException, BackgroundTasks
 from app.db.models import UserAPIKeys, User
 from app.schemas.schemas import AuthRequest
+from app.services.services import verify_user
 
 
 class APIKeyManager:
@@ -16,7 +17,7 @@ class APIKeyManager:
 
     def __init__(self) -> None:
         self.private_salt = self._load_private_salt()
-        self.key_prefix = "sk_live_"
+        self.key_prefix = self._load_key_prefix()
 
     @staticmethod
     def _load_private_salt() -> str:
@@ -34,6 +35,22 @@ class APIKeyManager:
             raise ValueError("Environment variable 'API_SALT' is not set")
         return private_salt
 
+    @staticmethod
+    def _load_key_prefix() -> str:
+        """
+        Load key prefix from environment variables.
+
+        Returns:
+            str: The key prefix value
+
+        Raises:
+            ValueError: If the 'API_KEY_PREFIX' environment variable is not set
+        """
+        key_prefix = os.getenv("API_KEY_PREFIX")
+        if not key_prefix:
+            raise ValueError("Environment variable 'API_KEY_PREFIX' is not set")
+        return key_prefix
+
     def generate_key(self, email: str) -> str:
         """
         Generate a secure API key based on email and salt.
@@ -44,7 +61,7 @@ class APIKeyManager:
         Returns:
             str: The generated API key
         """
-        key_base = f"{email}{self.private_salt}{datetime.utcnow().timestamp()}"
+        key_base = f"{email}{self.private_salt}{datetime.now().timestamp()}"
         generated_key = hashlib.sha256(key_base.encode('utf-8')).hexdigest()
         return f"{self.key_prefix}{generated_key}"
 
@@ -79,7 +96,7 @@ class APIKeyManager:
         new_key = UserAPIKeys(
             user_id=user_id,
             api_key=api_key,
-            created_at=datetime.utcnow()
+            created_at=datetime.now()
         )
         db.add(new_key)
         db.commit()
@@ -132,9 +149,15 @@ class APIKeyManager:
             HTTPException: If the user is not found or there's an error updating the API key.
         """
         # Fetch the user from the database
-        current_user = db.query(User).filter(User.email == user.email).first()
-        if not current_user:
-            raise HTTPException(status_code=404, detail="User not found")
+
+        try:
+            current_user = verify_user(user, db)
+            if not current_user:
+                raise HTTPException(status_code=404, detail="User not found")
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
         # Generate a new API key
         try:
@@ -144,19 +167,17 @@ class APIKeyManager:
             store_key = UserAPIKeys(
                 user_id=int(str(current_user.id)),
                 api_key=new_api_key,
-                created_at=datetime.utcnow()
+                created_at=datetime.now()
             )
             db.add(store_key)
             db.commit()
-
-            if not isinstance(current_user.id, int):
-                raise ValueError("User ID must be an integer")
 
             # Schedule the deletion of old keys
             background_tasks.add_task(
                 self.delete_old_key,
                 db=db,
-                user_id=int(str(current_user.id))
+                user_id=int(str(current_user.id)),
+                delay_minutes=5
             )
 
             return new_api_key
