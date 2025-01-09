@@ -17,11 +17,12 @@ Test Cases:
 
 import pytest
 from fastapi.testclient import TestClient
-from main import app
-from app.db.database import get_db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from app.db.database import get_db
 from app.db.models import Base
+from main import app
 
 # Setup test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -81,7 +82,7 @@ def test_register_user_success(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "testuser@example.com",
             "password": "Password123"
@@ -105,7 +106,7 @@ def test_register_user_duplicate(client, test_db):
     """
     # Create a user first
     client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "duplicateuser@example.com",
             "password": "Password123"
@@ -114,7 +115,7 @@ def test_register_user_duplicate(client, test_db):
 
     # Try creating the same user again
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "duplicateuser@example.com",
             "password": "Password1"
@@ -136,7 +137,7 @@ def test_register_user_invalid_email(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={
             "email": "invalidemail",
             "password": "Password1"
@@ -158,7 +159,7 @@ def test_register_user_missing_fields(client, test_db):
         test_db (Session): The test database session fixture
     """
     response = client.post(
-        "api/v1/user/register",
+        "api/v1/auth/register",
         json={}
     )
     assert response.status_code == 422

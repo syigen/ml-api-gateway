@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, constr, field_validator
 
 
-class User(BaseModel):
+class UserCreate(BaseModel):
     """
        Represents a user registration request.
 

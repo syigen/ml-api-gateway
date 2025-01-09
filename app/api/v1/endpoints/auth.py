@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.schemas.auth_schemas import AuthRequest, AuthResponse
-from app.schemas.user_schemas import User, RegisterResponse
+from app.schemas.user_schemas import UserCreate, RegisterResponse
 from app.services.auth_services import verify_user, get_user_api_key
 from app.services.user_service import create_user
 
@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=RegisterResponse)
-def register_user(user: User, db: Session = Depends(get_db)):
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """
         Registers a new user.
 
@@ -26,7 +26,7 @@ def register_user(user: User, db: Session = Depends(get_db)):
     try:
         # Create the user
         created_user = create_user(user, db)
-        return RegisterResponse(email=created_user.email, message="User registered successfully.")
+        return RegisterResponse(email=EmailStr(created_user.email), message="User registered successfully.")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

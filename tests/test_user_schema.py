@@ -6,13 +6,12 @@ It uses pytest's parametrize feature for comprehensive validation testing
 and mocking for isolated password validation tests.
 """
 
-import pytest
 from unittest.mock import patch
 
+import pytest
 from pydantic.v1 import EmailStr
 
-from app.schemas.user_schemas import User
-from app.schemas.user_schemas import RegisterResponse
+from app.schemas.user_schemas import UserCreate
 
 
 def test_user_create_valid():
@@ -21,7 +20,7 @@ def test_user_create_valid():
     Verifies that a User instance can be created with valid email
     and password, and that the values are correctly stored.
     """
-    user = User(email=EmailStr("test@example.com"), password="Password123")
+    user = UserCreate(email=EmailStr("test@example.com"), password="Password123")
     assert user.email == "test@example.com"
     assert user.password == "Password123"
 
@@ -51,7 +50,7 @@ def test_user_create_invalid_password(email, password, value_error):
         ValueError: Expected to be raised with specific error message for each invalid case
     """
     with pytest.raises(ValueError, match=value_error):
-        User(email=EmailStr(email), password=password)
+        UserCreate(email=EmailStr(email), password=password)
 
 
 @pytest.mark.parametrize("email, password", [
@@ -79,10 +78,10 @@ def test_user_create_invalid_email(email, password):
         ValueError: Expected to be raised for each invalid email format
     """
     with pytest.raises(ValueError):
-        User(email=EmailStr(email), password=password)
+        UserCreate(email=EmailStr(email), password=password)
 
 
-@patch('app.schemas.user_schemas.User.validate_password')
+@patch('app.schemas.user_schemas.UserCreate.validate_password')
 def test_user_create_validates_password(mock_validate_password):
     """Test that password validation is called during User instantiation.
 
@@ -94,4 +93,4 @@ def test_user_create_validates_password(mock_validate_password):
     """
     mock_validate_password.side_effect = ValueError("Password must contain at least one digit")
     with pytest.raises(ValueError):
-        User(email=EmailStr("test@example.com"), password="password")
+        UserCreate(email=EmailStr("test@example.com"), password="password")
