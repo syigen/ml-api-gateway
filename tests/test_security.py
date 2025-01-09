@@ -1,16 +1,18 @@
-import pytest
-from datetime import datetime
 import os
+from datetime import datetime
 from unittest.mock import patch
+
+import pytest
 from fastapi import HTTPException
 from pydantic.v1 import EmailStr
 
 from app.core.security import verify_api_key, APIKeyManager
-from app.schemas.schemas import AuthRequest
-from .test_database import db_session, api_key_manager, test_key_user, background_tasks, UserAPIKeys
+from app.schemas.auth_schemas import AuthRequest
+from .conftest import db_session, api_key_manager, test_key_user, background_tasks, UserAPIKeys
 
 # Constant Values
 const_key_prefix = 'sk_live_'
+
 
 def test_api_key_manager_initialization(api_key_manager):
     """

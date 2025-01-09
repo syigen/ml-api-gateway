@@ -1,56 +1,3 @@
-import pytest
-from fastapi.testclient import TestClient
-from main import app
-from app.db.database import get_db
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.db.models import Base
-
-# Setup test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-
-@pytest.fixture
-def client():
-    """
-        Fixture to provide a FastAPI TestClient for testing API endpoints.
-
-        This fixture overrides the FastAPI dependency `get_db` with an in-memory SQLite database
-        to isolate tests and ensure they do not affect the production database.
-        Yields:
-            TestClient: A test client to interact with the FastAPI app.
-    """
-
-    def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-
-
-@pytest.fixture
-def test_db():
-    """
-        Fixture for initializing and cleaning up the test database.
-
-        Yields:
-            Database session: A SQLAlchemy session connected to the in-memory SQLite database.
-        Performs cleanup to delete test data after the test completes.
-    """
-    db = TestingSessionLocal()
-    yield db
-    db.query(Base.metadata.tables['users']).delete()  # Cleanup
-    db.commit()
-
-
 def test_invalid_login_user(client, test_db):
     """
         Test case to verify that login fails with invalid credentials.
@@ -63,7 +10,7 @@ def test_invalid_login_user(client, test_db):
             test_db: The fixture providing the test database session.
     """
     response = client.post(
-        "api/v1/user/login",
+        "api/v1/auth/login",
         json={
             "email": "testuser@example.com",
             "password": "Password123"
@@ -71,6 +18,8 @@ def test_invalid_login_user(client, test_db):
     )
     assert response.status_code == 400
     data = response.json()
+    assert "detail" in data
+
 
 
 def test_login_user_invalid_email(client, test_db):
@@ -85,7 +34,7 @@ def test_login_user_invalid_email(client, test_db):
             test_db: The fixture providing the test database session.
     """
     response = client.post(
-        "api/v1/user/login",
+        "api/v1/auth/login",
         json={
             "email": "invalidemail",
             "password": "Password1"
@@ -107,7 +56,7 @@ def test_login_user_missing_fields(client, test_db):
             test_db: The fixture providing the test database session.
     """
     response = client.post(
-        "api/v1/user/login",
+        "api/v1/auth/login",
         json={}
     )
     assert response.status_code == 422

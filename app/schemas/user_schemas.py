@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, constr, field_validator
 
+
 class UserCreate(BaseModel):
     """
        Represents a user registration request.
@@ -28,6 +29,7 @@ class UserCreate(BaseModel):
         if not any(char.islower() for char in password):
             raise ValueError('Password must contain at least one lowercase letter')
         return password
+
 
 class RegisterResponse(BaseModel):
     email: EmailStr

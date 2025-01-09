@@ -1,8 +1,10 @@
-from fastapi import APIRouter
-from app.core.monitoring import timeit
 import asyncio
-from fastapi.testclient import TestClient
 import threading
+
+from fastapi import APIRouter
+from fastapi.testclient import TestClient
+
+from app.core.monitoring import timeit
 
 router = APIRouter()
 
@@ -12,6 +14,10 @@ response_time_data = {}
 @router.get("/response", tags=["Response"])
 @timeit
 async def get_responses():
+    """
+        Handles GET requests to the /response endpoint.
+        Simulates a delay of 1 second before returning a response.
+    """
     await asyncio.sleep(1)
     return {"message": "This is the /response endpoint."}
 
@@ -19,6 +25,11 @@ async def get_responses():
 @router.get("/response-usage", tags=["ResponseUsage"])
 @timeit
 def trigger_response_usage():
+    """
+    Triggers the calculation of response time for the /response endpoint.
+    Spawns a separate thread to make a request to /response and measure the response time.
+    The calculated response time is stored in the response_time_data dictionary.
+    """
     @timeit
     def measure_response_time():
         with TestClient(router) as client:

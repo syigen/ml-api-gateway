@@ -29,6 +29,7 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+
 class UserAPIKeys(Base):
     __tablename__ = "user_api_keys"
 

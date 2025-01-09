@@ -1,10 +1,19 @@
-from fastapi import APIRouter, FastAPI
-from functools import wraps
-import time
 import asyncio
+import time
+from functools import wraps
 
 
 def timeit(func):
+    """
+    Monitoring Utilities
+
+    This module provides utility functions for monitoring and measuring the performance of
+    asynchronous and synchronous functions.
+
+    It contains decorators that can be used to measure the execution time of functions and
+    print the results to the console.
+    """
+
     @wraps(func)
     async def async_timeit_wrapper(*args, **kwargs):
         start_time = time.perf_counter()

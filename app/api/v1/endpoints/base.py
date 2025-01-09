@@ -10,6 +10,7 @@ router = APIRouter()
 async def root():
     return {"version": "1.0.0"}
 
+
 @router.get("/protected-endpoint")
 async def protected_endpoint(user: User = Depends(validate_api_key)):
     return {"message": f"Welcome {user.email}!"}
