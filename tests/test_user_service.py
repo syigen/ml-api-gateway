@@ -16,8 +16,9 @@ import pytest
 from pydantic.v1 import EmailStr
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.db.models import Base
-from app.schemas.user import UserCreate
+from app.schemas.user_schemas import UserCreate
 from app.services.user_service import create_user, get_password_hash
 
 # Test Database Setup
@@ -51,7 +52,7 @@ def sample_user():
     Creates a sample user for testing.
 
     Returns:
-        UserCreate: A user creation schema with test data.
+        User: A user creation schema with test data.
     """
     return UserCreate(
         email=EmailStr("Dileepa@gmail.com"),
@@ -65,7 +66,7 @@ def duplicate_user():
     Creates a duplicate user with the same email for testing uniqueness constraints.
 
     Returns:
-        UserCreate: A user creation schema with the same email as sample_user.
+        User: A user creation schema with the same email as sample_user.
     """
     return UserCreate(
         email=EmailStr("Sadeepa@gmail.com"),
