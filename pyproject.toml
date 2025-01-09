@@ -18,6 +18,7 @@ fastapi-login = "^1.10.3"
 passlib = "^1.7.4"
 bcrypt = "^4.2.1"
 email-validator = "^2.2.0"
+pytest = "^8.3.4"
 
 [build-system]
 requires = ["poetry-core"]
