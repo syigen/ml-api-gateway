@@ -1,39 +1,29 @@
+from fastapi import APIRouter, FastAPI
+from functools import wraps
 import time
-import httpx
-from fastapi import APIRouter
-
-router = APIRouter()
+import asyncio
 
 
-@router.get("/response", tags=["Response"])
-async def get_responses():
-    return {"message": "This is the /response endpoint."}
+def timeit(func):
+    @wraps(func)
+    async def async_timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = await func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        print(f"Async Function {func.__name__} Took {total_time:.4f} seconds")
+        return result
 
+    @wraps(func)
+    def sync_timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        print(f"Sync Function {func.__name__} Took {total_time:.4f} seconds")
+        return result
 
-@router.get("/response-usage", tags=["ResponseUsage"])
-async def log_response_usage():
-
-    response_api_url = "http://localhost:8000/api/v1/response"
-
-    start_time = time.time()
-
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(response_api_url, timeout=10.0)
-            end_time = time.time()
-
-            response_time = end_time - start_time
-
-            print(f"Response time for /response: {response_time:.4f} seconds")
-
-            return {
-                "message": "Logged response time successfully",
-                "response_time": response_time,
-                "status_code": response.status_code
-            }
-        except httpx.RequestError as e:
-
-            print(f"Failed to call /response: {e}")
-            return {"message": "Failed to call /response", "error": str(e)}
-
-
+    if asyncio.iscoroutinefunction(func):
+        return async_timeit_wrapper
+    else:
+        return sync_timeit_wrapper

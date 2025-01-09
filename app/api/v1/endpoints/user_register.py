@@ -9,9 +9,20 @@ router = APIRouter()
 
 @router.post("/register", response_model=RegisterResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+        Registers a new user.
+
+        Args:
+            user (UserCreate): User registration details
+            db (Session): Database session
+
+        Returns:
+            RegisterResponse: Newly created user's email and success message
+        """
     try:
+        # Create the user
         created_user = create_user(user, db)
-        return RegisterResponse(email=created_user.email, message="User  registered successfully.")
+        return RegisterResponse(email=created_user.email, message="User registered successfully.")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
