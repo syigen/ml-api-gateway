@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from pydantic import ValidationError
-from app.schemas.schemas import AuthRequest, AuthResponse
+from app.schemas.auth_schemas import AuthRequest, AuthResponse
 
 
 class TestAuthModels(unittest.TestCase):

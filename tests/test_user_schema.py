@@ -1,6 +1,6 @@
-"""Test suite for UserCreate schema validation.
+"""Test suite for User schema validation.
 
-This module contains test cases for validating the UserCreate schema,
+This module contains test cases for validating the User schema,
 including password complexity requirements and email format validation.
 It uses pytest's parametrize feature for comprehensive validation testing
 and mocking for isolated password validation tests.
@@ -11,17 +11,17 @@ from unittest.mock import patch
 
 from pydantic.v1 import EmailStr
 
-from app.schemas.user import UserCreate
-from app.schemas.user import RegisterResponse
+from app.schemas.user_schemas import User
+from app.schemas.user_schemas import RegisterResponse
 
 
 def test_user_create_valid():
-    """Test creation of UserCreate instance with valid credentials.
+    """Test creation of User instance with valid credentials.
 
-    Verifies that a UserCreate instance can be created with valid email
+    Verifies that a User instance can be created with valid email
     and password, and that the values are correctly stored.
     """
-    user = UserCreate(email=EmailStr("test@example.com"), password="Password123")
+    user = User(email=EmailStr("test@example.com"), password="Password123")
     assert user.email == "test@example.com"
     assert user.password == "Password123"
 
@@ -35,7 +35,7 @@ def test_user_create_valid():
     ("test@example.com", "PASSWORD1", "Password must contain at least one lowercase letter"),
 ])
 def test_user_create_invalid_password(email, password, value_error):
-    """Test password validation rules for UserCreate schema.
+    """Test password validation rules for User schema.
 
     Tests various password validation rules including:
     - Must contain at least one digit
@@ -51,7 +51,7 @@ def test_user_create_invalid_password(email, password, value_error):
         ValueError: Expected to be raised with specific error message for each invalid case
     """
     with pytest.raises(ValueError, match=value_error):
-        UserCreate(email=EmailStr(email), password=password)
+        User(email=EmailStr(email), password=password)
 
 
 @pytest.mark.parametrize("email, password", [
@@ -62,7 +62,7 @@ def test_user_create_invalid_password(email, password, value_error):
     ("testmail@gamil.", "Password123"),
 ])
 def test_user_create_invalid_email(email, password):
-    """Test email format validation for UserCreate schema.
+    """Test email format validation for User schema.
 
     Tests various invalid email formats including:
     - Missing @ symbol
@@ -79,12 +79,12 @@ def test_user_create_invalid_email(email, password):
         ValueError: Expected to be raised for each invalid email format
     """
     with pytest.raises(ValueError):
-        UserCreate(email=EmailStr(email), password=password)
+        User(email=EmailStr(email), password=password)
 
 
-@patch('app.schemas.user.UserCreate.validate_password')
+@patch('app.schemas.user_schemas.User.validate_password')
 def test_user_create_validates_password(mock_validate_password):
-    """Test that password validation is called during UserCreate instantiation.
+    """Test that password validation is called during User instantiation.
 
     Uses mocking to verify that the validate_password method is called
     and that validation errors are properly propagated.
@@ -94,4 +94,4 @@ def test_user_create_validates_password(mock_validate_password):
     """
     mock_validate_password.side_effect = ValueError("Password must contain at least one digit")
     with pytest.raises(ValueError):
-        UserCreate(email=EmailStr("test@example.com"), password="password")
+        User(email=EmailStr("test@example.com"), password="password")

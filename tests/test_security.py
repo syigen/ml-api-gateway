@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from pydantic.v1 import EmailStr
 
 from app.core.security import verify_api_key, APIKeyManager
-from app.schemas.schemas import AuthRequest
+from app.schemas.auth_schemas import AuthRequest
 from .test_database import db_session, api_key_manager, test_key_user, background_tasks, UserAPIKeys
 
 # Constant Values

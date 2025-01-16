@@ -17,7 +17,7 @@ from pydantic.v1 import EmailStr
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.db.models import Base
-from app.schemas.user import UserCreate
+from app.schemas.user_schemas import UserCreate
 from app.services.user_service import create_user, get_password_hash
 
 # Test Database Setup
