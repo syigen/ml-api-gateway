@@ -30,6 +30,7 @@ def trigger_response_usage():
     Spawns a separate thread to make a request to /response and measure the response time.
     The calculated response time is stored in the response_time_data dictionary.
     """
+
     @timeit
     def measure_response_time():
         with TestClient(router) as client:

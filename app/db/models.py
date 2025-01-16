@@ -29,6 +29,7 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+
 class UserAPIKeys(Base):
     """
         Represents the API keys associated with users.

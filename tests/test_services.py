@@ -1,12 +1,13 @@
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+from passlib.context import CryptContext
 from pydantic.v1 import EmailStr
 from sqlalchemy.orm import Session
+
+from app.db.models import User
 from app.schemas.auth_schemas import AuthRequest
 from app.services.auth_services import verify_user
-from app.db.models import User
-from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
