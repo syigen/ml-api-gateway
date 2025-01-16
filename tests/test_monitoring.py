@@ -8,14 +8,6 @@ ENDPOINT = "http://127.0.0.1:8000"
 
 
 def test_can_get_response_usage():
-    """
-    Test the /api/v1/monitor/response-usage endpoint.
-
-    This test verifies:
-    1. The /response-usage endpoint returns a 200 status code and correct response message.
-    2. The /response endpoint can be triggered subsequently and its response time is calculated.
-    """
-
     response = requests.get(ENDPOINT + "/api/v1/monitor/response-usage")
     assert response.status_code == 200
     print(f"/response-usage Status Code: {response.status_code}")
@@ -37,14 +29,6 @@ def test_can_get_response_usage():
 
 
 def test_can_get_response():
-    """
-    Test the /api/v1/monitor/response endpoint.
-
-    This test ensures:
-    1. The endpoint is accessible and returns a 200 status code.
-    2. The response body contains the expected message.
-    """
-
     response = requests.get(ENDPOINT + "/api/v1/monitor/response")
     print(f"Response Status Code: {response.status_code}")
     print(f"Response Body: {response.text}")
@@ -54,14 +38,6 @@ def test_can_get_response():
 
 
 def test_error_handling():
-    """
-    Test error handling for a non-existent endpoint.
-
-    This test verifies:
-    1. Accessing a non-existent endpoint returns a 404 status code.
-    2. The response contains appropriate error information.
-    """
-
     response = client.get("/nonexistent")
     print(f"Error Handling Status Code: {response.status_code}")
     print(f"Error Handling Body: {response.text}")
